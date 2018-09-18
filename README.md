@@ -1,2 +1,2 @@
 # vault-dump
-Dump everything on /secret from Hashicorp Vault
+Dump everything that's on /secret from Hashicorp Vault
