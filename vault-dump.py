@@ -21,6 +21,7 @@ import os
 import pwd
 import hvac
 import datetime
+import boto3
 
 
 def print_header():
@@ -54,16 +55,32 @@ def recurse_for_values(path_prefix, candidate_key):
             stripped_prefix=path_prefix[:-1]
             try:
                 final_dict = client.read(next_index)['data']
-                print "vault write {} \\".format(next_index)
+                # print "vault write {} \\".format(next_index)
             except TypeError:
                 continue
             sorted_final_keys = sorted(final_dict.keys())
             for final_key in sorted_final_keys[:-1]:
                 final_value = final_dict[final_key]
-                print "  {0}=\'{1}\' \\".format(final_key, final_value)
+                ssmName = "{0}/{1}".format(next_index, final_key).lower().replace("secret/","").replace("qa3","qa")
+                # print "  {0}={1}".format(final_key, final_value)
+                print "{0}={1}".format(ssmName, final_value)
+                ssmClient.put_parameter(
+                        Name=ssmName,
+                        Description=final_key,
+                        Value=final_value,
+                        Type='SecureString',
+                        Overwrite=True)
             last_final_key = sorted_final_keys[-1]
             last_final_value = final_dict[last_final_key]
-            print "  {0}=\'{1}\'".format(last_final_key, last_final_value)
+            # print "  {0}={1}".format(last_final_key, last_final_value)
+            ssmName = "{0}/{1}".format(next_index, last_final_key).lower().replace("secret/","").replace("qa3","qa")
+            print "{0}={1}".format(ssmName, last_final_value)
+            ssmClient.put_parameter(
+                        Name=ssmName,
+                        Description=last_final_key,
+                        Value=last_final_key,
+                        Type='SecureString',
+                        Overwrite=True)
 
 
 env_vars = os.environ.copy()
@@ -77,10 +94,11 @@ hvac_client = {
     'url': hvac_url,
     'token': hvac_token,
 }
+ssmClient = boto3.client('ssm')
 client = hvac.Client(**hvac_client)
 assert client.is_authenticated()
 
-top_vault_prefix = os.environ.get('TOP_VAULT_PREFIX','/secret/')
+top_vault_prefix = os.environ.get('TOP_VAULT_PREFIX','/secret/QA3/')
 
 print_header()
 top_level_keys = client.list(top_vault_prefix)
