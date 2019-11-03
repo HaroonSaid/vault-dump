@@ -1,0 +1,21 @@
+{
+  "name": "vault-dump",
+  "version": "1.0.0",
+  "main": "flatten.js",
+  "repository": "git@github.com:HaroonSaid/vault-dump.git",
+  "author": "Haroon Said <hsaid@axs.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "./node_modules/.bin/ts-node flatten"
+  },
+  "dependencies": {
+    "@types/aws-param-store": "^2.1.0",
+    "aws-param-store": "^3.0.0",
+    "aws-sdk": "^2.562.0",
+    "flat": "^5.0.0",
+    "ts-node": "^8.4.1",
+    "typescript": "^3.6.4",
+    "unflatten": "^1.0.4",
+    "yarn": "^1.19.1"
+  }
+}
